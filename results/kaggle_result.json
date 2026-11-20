@@ -1,0 +1,11 @@
+{
+  "public_score": 0.524,
+  "rank_user_reported": 4096,
+  "rank_scope": "not independently verified",
+  "observed_date": "2026-11-20",
+  "source": "user report",
+  "submission_id": 58589746,
+  "kernel": "yifeiorange/qwen8b-api-write-probe",
+  "version": 8,
+  "checkpoint": "full_fit/final_epoch2"
+}

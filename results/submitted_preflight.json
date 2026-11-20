@@ -1,0 +1,13 @@
+{
+  "model": "Qwen3-8B-Base first24 multi-depth two-stage LoRA",
+  "checkpoint": "full_fit/final_epoch2",
+  "oof_balanced_accuracy": 0.5564031817051951,
+  "rows": 3,
+  "dtype": "float32",
+  "base_tensors_verified": 265,
+  "seconds": 123.994966146,
+  "gpu_names": [
+    "Tesla T4",
+    "Tesla T4"
+  ]
+}

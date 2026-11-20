@@ -1,0 +1,6 @@
+{
+  "peak_reserved_gib": 11.099609375,
+  "sequence_length": 384,
+  "microbatch": 3,
+  "trainable_parameters": 30343204
+}

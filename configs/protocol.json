@@ -1,0 +1,110 @@
+{
+  "strategy": "Qwen3-8B-Base truncated multi-depth two-stage LoRA",
+  "model_id": "Qwen/Qwen3-8B-Base",
+  "revision": "49e3418fbbbca6ecbdf9608b4d22e5a407081db4",
+  "reference": "https://www.kaggle.com/code/nishantdahal/two-stage-lora-on-the-public-pool",
+  "layers_kept": 24,
+  "pooled_depths": [
+    2,
+    4,
+    6,
+    8,
+    12,
+    16,
+    20,
+    24
+  ],
+  "pooling": "masked mean + per-depth LayerNorm + concatenation",
+  "final_backbone_norm": "Identity",
+  "queue_conditions": {
+    "model_download": "complete and pinned revision matches",
+    "gpu_used_memory_mib_below": 2048,
+    "gpu_utilization_percent_below": 10,
+    "gpu_free_memory_mib_at_least": 27000,
+    "consecutive_idle_checks": 3,
+    "check_interval_seconds": 20,
+    "wait_timeout_hours": 24,
+    "memory_preflight_reserved_gib_at_most": 24
+  },
+  "automatic_followup": {
+    "pilot_gate": "Fold 1 fixed epoch-2 validation BA >= 0.46",
+    "on_pass": "Complete remaining four folds, each restored from external-only stage-1 state and trained for two fixed epochs",
+    "full_fit_gate": "Five-fold OOF BA >= 0.46",
+    "final_fit": "Restore external-only stage-1 state and train two epochs on all official rows; no validation score is claimed for full fit"
+  },
+  "heads": [
+    "plain 18-class",
+    "same-prompt-centered 18-class"
+  ],
+  "lora": {
+    "rank": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "stage1": {
+    "data": "screened_public_pool.parquet",
+    "rows": 35236,
+    "epochs": 1,
+    "lora_lr": 0.0001,
+    "head_lr": 0.001,
+    "class_weighted": true,
+    "optimizer": "AdamW",
+    "warmup_fraction": 0.1,
+    "schedule": "cosine"
+  },
+  "stage2": {
+    "data": "official training fold only",
+    "epochs": 2,
+    "lora_lr": 0.00005,
+    "head_lr": 0.0005,
+    "restore_same_stage1_for_each_fold": true
+  },
+  "memory_plan": {
+    "dtype": "bf16",
+    "gradient_checkpointing": true,
+    "microbatch_passages": 3,
+    "triplet_size": 3,
+    "gradient_accumulation_steps": 6,
+    "max_length": 384,
+    "anticipated_peak_gib": [
+      16,
+      22
+    ],
+    "requires_real_peak_measurement": true
+  },
+  "validation": {
+    "screening": "existing GroupKFold Fold 1, 2159 train / 540 validation",
+    "confirmation": "same 5 GroupKFold(prompt_id) folds",
+    "primary": "plain-head balanced accuracy",
+    "secondary": "centered-head performance using simulated 1/2/3-passage clusters; no assumption of complete 18-class groups",
+    "preregistered_pilot_goal_ba": 0.46,
+    "goal_is_not_guarantee": true,
+    "report_every_epoch": [
+      "train_ba",
+      "val_ba",
+      "train_loss",
+      "val_loss",
+      "peak_gpu_memory"
+    ]
+  },
+  "constraints": {
+    "do_not_modify_existing_environment_versions": true,
+    "no_training_on_busy_gpu": true,
+    "do_not_use_competition_finetuned_public_weights_as_unseen_fold_evaluation": true
+  },
+  "data_caveats": [
+    "External pool preparation used official-train typography filters.",
+    "Lexical overlap screening cannot prove absence of paraphrased-prompt overlap.",
+    "Current public-data SVC result is a single-fold exploratory comparison, not full OOF or Kaggle score."
+  ],
+  "status": "protocol and data prepared; base download started; GPU training not started"
+}
