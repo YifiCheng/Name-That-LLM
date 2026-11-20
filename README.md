@@ -1,6 +1,6 @@
 # Name That LLM：Qwen3-8B 两阶段 LoRA
 
-本仓库保存目前最佳方案的训练代码、实际提交推理代码和复现步骤，直接在 Venus 上整理并上传。
+本仓库保存目前最佳方案的训练代码、实际提交推理代码和复现步骤，直接在 实验室服务器 上整理并上传。
 
 | 指标 | 数值 |
 |---|---:|
@@ -52,7 +52,7 @@ export NTL_ROOT="$PWD"
 python scripts/train.py --self-test
 ```
 
-requirements 从实际 Venus 环境读取，包含 PyTorch 2.10.0+cu128、Transformers 5.20.2、PEFT 0.21.2。还需要兼容的 NVIDIA 驱动。不同硬件、软件及算子可能带来数值差异，不保证逐位复现。
+requirements 从实际 实验室服务器 环境读取，包含 PyTorch 2.10.0+cu128、Transformers 5.20.2、PEFT 0.21.2。还需要兼容的 NVIDIA 驱动。不同硬件、软件及算子可能带来数值差异，不保证逐位复现。
 
 训练入口要求显卡空闲显存至少 27,000 MiB，连续三次空闲检查后才启动；进程显存上限比例为 0.8，并进行实际训练预检。原记录峰值 reserved 约 12.9 GiB，部署仍应保留加载及其他进程的显存余量。
 
@@ -120,7 +120,7 @@ python scripts/export_kaggle.py
 
 实际通过验证的 Kaggle 环境：PyTorch 2.11.0+cu130、Transformers 5.20.2、safetensors 0.8.0；使用 Accelerate balanced 设备映射、FP32、batch size 2、最大长度 384。推理手动实现 LoRA，不依赖 PEFT。Kaggle 镜像可能变化，需先完整运行验证兼容性。
 
-输出 /kaggle/working/submission.parquet，列为 id、model。完成 Save Version / Run All 后再提交成功的版本。Kaggle 服务器会替换隐藏数据并重跑，不是在 Venus 直接计算官方分数。
+输出 /kaggle/working/submission.parquet，列为 id、model。完成 Save Version / Run All 后再提交成功的版本。Kaggle 服务器会替换隐藏数据并重跑，不是在 实验室服务器 直接计算官方分数。
 
 CLI 入口：将 configs/kernel-metadata.json 复制至 Notebook 所在目录，修改 id 为自己的 Notebook，修改 Dataset ID，确保 code_file 与实际文件匹配。
 
@@ -138,6 +138,6 @@ kaggle competitions submit name-that-llm \
 
 ## 整理与验证说明
 
-scripts/train.py 只将根路径改为 NTL_ROOT，并以相同 GroupKFold 重新生成折索引，替代旧 UltraBERT OOF 文件校验；原始源码位于 archive。准备及导出脚本也支持 NTL_ROOT，模型下载固定实际 revision。正式推理代码直接复制自 Venus 的已提交版本。
+scripts/train.py 只将根路径改为 NTL_ROOT，并以相同 GroupKFold 重新生成折索引，替代旧 UltraBERT OOF 文件校验；原始源码位于 archive。准备及导出脚本也支持 NTL_ROOT，模型下载固定实际 revision。正式推理代码直接复制自 实验室服务器 的已提交版本。
 
 未在整理期间重新训练或新增 Kaggle 提交。模型、外部数据及参考代码遵循各自原许可，本仓库不替第三方资产重新授权。
